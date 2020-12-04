@@ -149,12 +149,14 @@ job_hpo = Job(hpo)\
                     .add_profiles(Namespace.PEGASUS, key="maxwalltime", value=1)\
                     .add_outputs(output_file)
 
+# clearing PYTHONPATH for this job makes this work on OSG
 job_vgg_model = Job(vgg_model)\
                     .add_args("-epochs",6, "--batch_size",2)\
                     .add_checkpoint(File(checkpoint_file), stage_out=True)\
                     .add_inputs(*augmented_files,training_data,testing_data,val_data,output_file)\
                     .add_profiles(Namespace.PEGASUS, key="maxwalltime", value=1)\
-                    .add_outputs(model)
+                    .add_outputs(model)\
+                    .add_env(PYTHONPATH="")
 
 results_file = File('Result_Metrics.txt')
 job_test_model = Job(test_model)\
