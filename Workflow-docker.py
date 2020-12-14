@@ -17,8 +17,11 @@ from Pegasus.api import *
 
 # --- Properties ---------------------------------------------------------------
 props = Properties()
-props["dagman.retry"] = "100"
-props["pegasus.transfer.arguments"] = "-m 1"
+#props["dagman.retry"] = "100"
+props["pegasus.mode"] = "development"
+#props["pegasus.transfer.arguments"] = "-m 1"
+props["pegasus.monitord.encoding"] = "json"
+props["pegasus.catalog.workflow.amqp.url"] = "amqp://friend:donatedata@msgs.pegasus.isi.edu:5672/prod/workflows"
 props.write()
 
 # --- Replica Catalog ----------------------------------------------------------
@@ -102,9 +105,17 @@ test_model =  Transformation( "Test.py",
 # add OSG specific settings
 if RUN_ON_OSG:
     for tr in [pre_process_resize, pre_process_augment, data_split, hpo, vgg_model, test_model]:
-        tr.add_condor_profile(requirements='HAS_SINGULARITY == True')
+        # container settings
+        tr.add_condor_profile(requirements='HAS_SINGULARITY == True && OSG_HOST_KERNEL_VERSION >= 31000')
         tr.add_profiles(Namespace.CONDOR, key="+SingularityImage", value='"/cvmfs/singularity.opensciencegrid.org/ssrujanaa/catsanddogs:latest"')
-    # add request_gpus for tr that need it
+        # clear PYTHONPATH (some sites add to PYTHONPATH and the tr will end up throwing error from python2.7
+        # AttributeError: module 'importlib._bootstrap' has no attribute 'SourceFileLoader'
+        tr.add_env(PYTHONPATH="")
+
+    # add request_gpus for transformations that can take advantage of GPU access
+    for tr in [hpo, vgg_model]:
+        tr.add_pegasus_profile(gpus=1)
+
 
 tc = TransformationCatalog()
 tc.add_containers(tools_container)
@@ -146,7 +157,6 @@ output_file = File('hpo_results.pkl')
 job_hpo = Job(hpo)\
                     .add_checkpoint(File(hpo_checkpoint_file), stage_out=True)\
                     .add_inputs(*augmented_files,training_data,testing_data,val_data)\
-                    .add_profiles(Namespace.PEGASUS, key="maxwalltime", value=1)\
                     .add_outputs(output_file)
 
 # clearing PYTHONPATH for this job makes this work on OSG
@@ -154,9 +164,7 @@ job_vgg_model = Job(vgg_model)\
                     .add_args("-epochs",6, "--batch_size",2)\
                     .add_checkpoint(File(checkpoint_file), stage_out=True)\
                     .add_inputs(*augmented_files,training_data,testing_data,val_data,output_file)\
-                    .add_profiles(Namespace.PEGASUS, key="maxwalltime", value=1)\
-                    .add_outputs(model)\
-                    .add_env(PYTHONPATH="")
+                    .add_outputs(model)
 
 results_file = File('Result_Metrics.txt')
 job_test_model = Job(test_model)\
