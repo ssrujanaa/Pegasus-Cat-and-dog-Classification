@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM opensciencegrid/tensorflow-gpu:2.3-cuda-10.1
 WORKDIR /usr/bin
 
 COPY preprocess1.py ./
@@ -20,18 +20,13 @@ COPY Test.py ./
 RUN chmod 777 ./Test.py
 
 
-RUN apt-get update && apt install python3-pip wget curl -y
-RUN python3 -m pip install --upgrade pip setuptools
+RUN apt-get update && apt install wget curl -y
+RUN pip3 uninstall tensorflow -y
 RUN pip3 install \
-        --upgrade pip \
-        keras==2.1.5 \
-        tensorflow==1.13.1 \
-        tensorflow-gpu==1.15 \
-        numpy \
-        pandas \
-        pillow \
-        sklearn \
-        optuna \
-        scikit-image  \
-        optkeras \
-        h5py==2.10.0 
+    --upgrade pip \
+    tensorflow-gpu==1.15 \
+    keras==2.1.5 \
+    optuna \
+    scikit-image  \
+    optkeras \
+    h5py==2.10.0 
