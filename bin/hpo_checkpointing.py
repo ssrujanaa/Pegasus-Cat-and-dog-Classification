@@ -6,19 +6,18 @@ import pickle
 from os import listdir
 from numpy import asarray
 from numpy import save
-from keras.preprocessing.image import load_img
-from keras.preprocessing.image import img_to_array
+from tensorflow.keras.preprocessing.image import load_img
+from tensorflow.keras.preprocessing.image import img_to_array
 import numpy as np
-from keras import layers
-from keras.layers import Input,Dense,BatchNormalization,Flatten,Dropout,GlobalAveragePooling2D
-from keras.models import Model, load_model
-from keras.utils import layer_utils
-from keras.optimizers import Adam
-from keras.callbacks import ModelCheckpoint
-from keras.callbacks import EarlyStopping
-import keras.backend as K
-from keras.applications.vgg16 import VGG16
-from keras.models import Model,load_model
+from tensorflow.keras import layers
+from tensorflow.keras.layers import Input,Dense,BatchNormalization,Flatten,Dropout,GlobalAveragePooling2D
+from tensorflow.keras.models import Model, load_model
+#from tensorflow.keras.utils import layer_utils
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.applications.vgg16 import VGG16
+from tensorflow.keras.models import Model,load_model
 from optkeras.optkeras import OptKeras
 import optkeras
 import pickle
@@ -33,14 +32,16 @@ optkeras.optkeras.get_trial_default = lambda: optuna.trial.FrozenTrial(
         None, None, None, None, None, None, None, None, None, None, None)
 
 
+
 import keras
 import tensorflow as tf
 from tensorflow.python.client import device_lib
 print(device_lib.list_local_devices())
 
-config = tf.ConfigProto( device_count = {'GPU': 1 , 'CPU': 56} ) 
-sess = tf.Session(config=config) 
-keras.backend.set_session(sess)
+config = tf.compat.v1.ConfigProto( device_count = {'GPU': 1 , 'CPU': 56} ) 
+sess = tf.compat.v1.Session(config=config) 
+#keras.backend.set_session(sess)
+tf.compat.v1.keras.backend.set_session(sess)
 
     
 def hpo_monitor(study, trial):
@@ -111,7 +112,7 @@ def objective(trial):
     x = GlobalAveragePooling2D()(x)
     x = Dense(1024, activation=trial.suggest_categorical('activation', ['relu', 'linear']))(x)
     predictions = Dense(nb_classes, activation = 'softmax')(x)
-    model = Model(input = vgg16_model.input, output = predictions)
+    model = Model(inputs = vgg16_model.input, outputs = predictions)
     for layer in vgg16_model.layers:
         layer.trainable = False
 
