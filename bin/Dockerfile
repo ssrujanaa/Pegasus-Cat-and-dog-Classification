@@ -21,11 +21,9 @@ RUN chmod 777 ./Test.py
 
 
 RUN apt-get update && apt install wget curl -y
-RUN pip3 uninstall tensorflow -y
 RUN pip3 install \
     --upgrade pip \
-    tensorflow-gpu==1.15 \
-    keras==2.1.5 \
+    keras==2.4.3 \
     optuna \
     scikit-image  \
     optkeras \
