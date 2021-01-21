@@ -7,26 +7,25 @@ import signal
 from os import listdir
 from numpy import asarray
 from numpy import save
-from keras.preprocessing.image import load_img
-from keras.preprocessing.image import img_to_array
+from tensorflow.keras.preprocessing.image import load_img
+from tensorflow.keras.preprocessing.image import img_to_array
 import numpy as np
-from keras import layers
-from keras.layers import Input,Dense,BatchNormalization,Flatten,Dropout,GlobalAveragePooling2D
-from keras.models import Model, load_model
-from keras.utils import layer_utils
-from keras.optimizers import Adam
-from keras.callbacks import ModelCheckpoint
-from keras.callbacks import CSVLogger
-import keras.backend as K
+from tensorflow.keras import layers
+from tensorflow.keras.layers import Input,Dense,BatchNormalization,Flatten,Dropout,GlobalAveragePooling2D
+from tensorflow.keras.models import Model, load_model
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.callbacks import CSVLogger
+import tensorflow.keras.backend as K
 import traceback
-from keras.applications.vgg16 import VGG16
-from keras.models import Model,load_model
+from tensorflow.keras.applications.vgg16 import VGG16
+from tensorflow.keras.models import Model,load_model
 import pandas as pd
 import h5py
 import sys
 import joblib
 import argparse
-import keras
+import tensorflow.keras
 import tensorflow as tf
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score

@@ -5,27 +5,25 @@ import signal
 from os import listdir
 from numpy import asarray
 from numpy import save
-from keras.preprocessing.image import load_img
-from keras.preprocessing.image import img_to_array
+from tensorflow.keras.preprocessing.image import load_img
+from tensorflow.keras.preprocessing.image import img_to_array
 import numpy as np
-from keras import layers
-from keras.layers import Input,Dense,BatchNormalization,Flatten,Dropout,GlobalAveragePooling2D
-from keras.models import Model, load_model
-from keras.utils import layer_utils
-from keras.optimizers import Adam
-from keras.callbacks import ModelCheckpoint
-from keras.callbacks import CSVLogger
-import keras.backend as K
+from tensorflow.keras import layers
+from tensorflow.keras.layers import Input,Dense,BatchNormalization,Flatten,Dropout,GlobalAveragePooling2D
+from tensorflow.keras.models import Model, load_model
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.callbacks import CSVLogger
+import tensorflow.keras.backend as K
 import traceback
-from keras.applications.vgg16 import VGG16
-from keras.models import Model,load_model
+from tensorflow.keras.applications.vgg16 import VGG16
+from tensorflow.keras.models import Model,load_model
 import pandas as pd
 import h5py
 import sys
 import joblib
 import argparse
 import keras
-import tensorflow as tf
 
 def parse_args(args):
     parser = argparse.ArgumentParser(description='Cat and Dog image classification using Keras')
@@ -101,7 +99,7 @@ def get_model():
     x = GlobalAveragePooling2D()(x)
     x = Dense(1024, activation='relu')(x)
     predictions = Dense(nb_classes, activation = activation_optuna)(x)
-    model = Model(input = vgg16_model.input, output = predictions)
+    model = Model(inputs = vgg16_model.input, outputs = predictions)
 
     for layer in vgg16_model.layers:
         layer.trainable = False
@@ -120,7 +118,7 @@ def main():
     train_from_beginning = False
     try:
         #Since our hdf5 file contains additional data = epochs, skip_mismatch is used to avoid that column
-        model.load_weights("checkpoint_file2.hdf5",skip_mismatch=True)
+        model.load_weights("checkpoint_file2.hdf5",skip_mismatch=True, by_name=True)
         with h5py.File('checkpoint_file2.hdf5', "r+") as file:
             data = file.get('epochs')[...].tolist()
             
@@ -149,7 +147,7 @@ def main():
             with h5py.File('checkpoint_file2.hdf5', "a") as file:
                 file['epochs']=i
 
-    model.save('model.h5')
+    model.save('model.h5', save_format='h5')
     return 0
     
 if __name__ == '__main__':
